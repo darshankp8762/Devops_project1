@@ -2,18 +2,12 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "username/devops-app"
+        IMAGE_NAME = "darshankp1/myimage"
         TAG = "v1"
     }
 
     stages {
-
-        stage('Clone Code') {
-            steps {
-                git 'https://github.com/your-username/your-repo.git'
-            }
-        }
-
+        
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME:$TAG .'
