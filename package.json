@@ -4,7 +4,178 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  },sudo apt update 
+sudo apt install maven -y 
+mvn archetype:generate -DgroupId=com.example.app \ -DartifactId=demo-app \ -DarchetypeArtifactId=maven-archetype-quickstart \ -DinteractiveMode=false 
+cd demo-app 
+ls 
+nano pom.xml 
+nano src/main/java/com/example/app/App.java 
+nano src/test/java/com/example/app/AppTest.java 
+mvn clean install 
+mvn exec:java -Dexec.mainClass="com.example.app.App" 
+git init 
+git add . 
+git commit -m "Initial commit" 
+git branch -M main 
+git remote add origin https://github.com/<your-username>/demo-app.git 
+git push -u origin main 
+sudo rm jenkins.war 
+sudo rm -rf ~/.jenkins 
+wget https://get.jenkins.io/war-stable/latest/jenkins.war 
+java -jar jenkins.war --httpPort=8090 
+#App.java 
+package com.example.app; 
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory; 
+import org.apache.commons.lang3.StringUtils; 
+public class App { 
+    private static final Logger logger = LoggerFactory.getLogger(App.class); 
+    public static void main(String[] args) { 
+        String name = "CI/CD Pipeline"; 
+        if (StringUtils.isNotBlank(name)) { 
+            String message = greet(name); 
+            logger.info(message); 
+            System.out.println(message); 
+        } else { 
+            logger.error("Name is empty!"); 
+        } 
+    } 
+    public static String greet(String name) { 
+        return "Hello, " + name + "! Welcome to Maven CI/CD Demo."; 
+    } 
+} 
+#AppTest.java 
+package com.example.app; 
+import org.junit.Test; 
+import static org.junit.Assert.assertEquals; 
+public class AppTest { 
+    @Test 
+    public void testGreet() { 
+        String result = App.greet("Student"); 
+        assertEquals("Hello, Student! Welcome to Maven CI/CD Demo.", result); 
+    } } 
+#Jenkinsfile 
+pipeline { 
+    agent any 
+    tools { 
+        maven 'Maven3' 
+        jdk 'JDK21' 
+    } 
+    stages { 
+        stage('Checkout') { 
+            steps { 
+                git branch:'main', 
+                    url:'https://github.com/Ankith0505/Maven-project.git' 
+            } 
+        } 
+        stage('Build') { 
+            steps { 
+                sh 'mvn clean compile' 
+            } 
+        } 
+        stage('Test') { 
+            steps { 
+                sh 'mvn test' 
+            } 
+        } 
+        stage('Package') { 
+            steps { 
+                sh 'mvn package' 
+            } 
+        } 
+        stage('Run Application') { 
+            steps { 
+                sh 'mvn exec:java -Dexec.mainClass="com.example.app.App"' 
+            } 
+        } 
+    } 
+    post { 
+        success { 
+            emailext ( 
+                subject: "SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}", 
+                body: "Build succeeded!\nCheck: ${BUILD_URL}", 
+                to: "ankithshetty0505@gmail.com" 
+            ) 
+        } 
+        failure { 
+            emailext ( 
+                subject: "FAILED: ${JOB_NAME} #${BUILD_NUMBER}", 
+                body: "Build failed!\nCheck: ${BUILD_URL}", 
+                to: "ankithshetty0505@gmail.com" 
+            ) 
+        } 
+    }    
+} 
+ 
+ 
+#pom.xml 
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven
+v4_0_0.xsd"> 
+  <modelVersion>4.0.0</modelVersion> 
+  <groupId>com.example.app</groupId> 
+  <artifactId>demo-app</artifactId> 
+  <packaging>jar</packaging> 
+  <version>1.0-SNAPSHOT</version> 
+  <name>demo-app</name> 
+  <url>http://maven.apache.org</url> 
+  <dependencies> 
+    <dependency> 
+       <groupId>ch.qos.logback</groupId> 
+       <artifactId>logback-classic</artifactId> 
+       <version>1.4.14</version> 
+    </dependency> 
+ 
+    <!-- JUnit for testing --> 
+    <dependency> 
+        <groupId>junit</groupId> 
+        <artifactId>junit</artifactId> 
+        <version>4.13.2</version> 
+        <scope>test</scope> 
+    </dependency> 
+ 
+    <!-- Logging --> 
+    <dependency> 
+        <groupId>org.slf4j</groupId> 
+        <artifactId>slf4j-api</artifactId> 
+        <version>2.0.9</version> 
+    </dependency> 
+ 
+    <!-- Apache Commons --> 
+    <dependency> 
+        <groupId>org.apache.commons</groupId> 
+        <artifactId>commons-lang3</artifactId> 
+        <version>3.14.0</version> 
+    </dependency> 
+ 
+ 
+  </dependencies> 
+<build> 
+<plugins> 
+ 
+        <!-- Compiler Plugin --> 
+        <plugin> 
+            <groupId>org.apache.maven.plugins</groupId> 
+            <artifactId>maven-compiler-plugin</artifactId> 
+            <version>3.11.0</version> 
+            <configuration> 
+                <source>17</source> 
+                <target>17</target> 
+            </configuration> 
+        </plugin> 
+ 
+        <!-- Test Plugin --> 
+        <plugin> 
+            <groupId>org.apache.maven.plugins</groupId> 
+            <artifactId>maven-surefire-plugin</artifactId> 
+            <version>3.1.2</version> 
+        </plugin> 
+ 
+    </plugins> 
+</build> 
+</project>
   "keywords": [],
   "author": "",
   "license": "ISC",
